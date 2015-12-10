@@ -1,0 +1,21 @@
+{
+	"animations":
+	{
+		"0":"healer_f.png",
+		"1":"healer_m.png",
+		"2":"mage_f.png",
+		"3":"mage_m.png",
+		"4":"ninja_f.png",
+		"5":"ninja_m.png",
+		"6":"ranger_f.png",
+		"7":"ranger_m.png",
+		"8":"townfolk_f.png",
+		"9":"townfolk_m.png",
+		"10":"warrior_f.png",
+		"11":"warrior_m.png"
+	},
+	"textures":
+	{
+		"0":"bomb.png"
+	}
+}

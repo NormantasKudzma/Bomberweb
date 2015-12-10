@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="libs/AppleJavaExtensions.jar"/>
+	<classpathentry kind="lib" path="libs/asm-debug-all.jar"/>
+	<classpathentry kind="lib" path="libs/lzma.jar"/>
+	<classpathentry kind="lib" path="libs/substance-7.2.1.jar"/>
+	<classpathentry kind="lib" path="libs/trident-7.2.1.jar"/>
+	<classpathentry kind="lib" path="libs/lwjgl_util_applet.jar"/>
+	<classpathentry kind="lib" path="libs/httpclient-win.jar"/>
+	<classpathentry kind="lib" path="libs/httpcore.jar"/>
+	<classpathentry kind="lib" path="libs/httpclient.jar"/>
+	<classpathentry kind="lib" path="libs/commons-logging.jar"/>
+	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/BombermanProject"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
