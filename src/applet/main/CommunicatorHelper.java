@@ -11,94 +11,103 @@ import org.json.JSONObject;
 import web.Communicator;
 import web.Communicator.ERequestType;
 
-public class CommunicatorHelper extends Thread implements IUpdatable{
+public class CommunicatorHelper extends Thread implements IUpdatable {
 	private static final float PLAYER_UPDATE_DELTA = 1.0f;
 	private static final float MOVE_DELTA = 1.0f;
 	private static final long SLEEP_DELTA = 1000;
 	private static final float SLEEP_DELTA_FLOAT = SLEEP_DELTA * 0.001f;
+	public static final CommunicatorHelper INSTANCE = new CommunicatorHelper();
 	
 	private WebEntityHelper entityHelper;
 	private Game game;
 	private PlayerEntity localPlayer;
-	private int localPid;
 	private int currentGameRoom = 1;
 	private float playerUpdate = 0.0f;
 	private float moveUpdate = 0.0f;
 	private boolean isFinished = false;
+
+	private CommunicatorHelper(){}
 	
-	public CommunicatorHelper(Game game){
+	public static final CommunicatorHelper getInstance(){
+		return INSTANCE;
+	}
+	
+	public void setGame(Game game) {
 		this.game = game;
 		entityHelper = new WebEntityHelper(game);
 	}
-	
-	public void init(){
-		JSONObject obj = Communicator.sendRequest(ERequestType.GET_PID);
-		localPid = obj.getInt("pid");
-		localPlayer = newPlayer(localPid, true);
+
+	public void setGameRoom(int id){
+		currentGameRoom = id;
 	}
 	
-	public void update(float deltaTime){
+	public void init() {
+		//JSONObject obj = Communicator.sendRequest(ERequestType.GET_PID);
+		//localPid = obj.getInt("pid");
+		//localPlayer = newPlayer(localPid, true);
+	}
+
+	public void update(float deltaTime) {
 		playerUpdate += deltaTime;
-		if (playerUpdate > PLAYER_UPDATE_DELTA){
+		if (playerUpdate > PLAYER_UPDATE_DELTA) {
 			playerUpdate = 0.0f;
 			updatePlayers();
 		}
-		
+
 		moveUpdate += deltaTime;
-		if (moveUpdate > MOVE_DELTA){
+		if (moveUpdate > MOVE_DELTA) {
 			moveUpdate = 0.0f;
 			movePlayer();
 		}
 	}
-	
-	public PlayerEntity newPlayer(int pid, boolean isLocal){
-		PlayerEntity player = new PlayerEntity(game);		
+
+	public PlayerEntity newPlayer(int pid, boolean isLocal) {
+		PlayerEntity player = new PlayerEntity(game);
 		player.setSprite(new SpriteAnimation("ranger_f.json"));
 		player.initEntity();
 		player.setPosition(1, 1);
-		if (isLocal){
+		if (isLocal) {
 			player.readKeybindings();
+			localPlayer = player;
 		}
 		entityHelper.addPlayer(pid, player);
 		return player;
 	}
 
-	public void updatePlayers(){
-		JSONObject obj = Communicator.sendRequest(ERequestType.UPDATE_PLAYERS, currentGameRoom, localPid);
+	public void updatePlayers() {
+		JSONObject obj = Communicator.sendRequest(ERequestType.UPDATE_PLAYERS, currentGameRoom, Communicator.playerPid);
 		JSONArray pids = obj.getJSONArray("pids");
 		int pid;
 		PlayerEntity player;
-		for (int i = 0; i < pids.length(); i++){
+		for (int i = 0; i < pids.length(); i++) {
 			pid = pids.getInt(i);
-			if (pid == localPid){
+			if (pid == Communicator.playerPid) {
 				continue;
 			}
 			player = entityHelper.getPlayerById(pid);
-			if (player == null){
+			if (player == null) {
 				player = newPlayer(pid, false);
 			}
 			JSONObject coordinates = obj.getJSONObject(pid + "");
-			player.setPosition((float)coordinates.getDouble("x"), (float)coordinates.getDouble("y"));
+			player.setPosition((float) coordinates.getDouble("x"), (float) coordinates.getDouble("y"));
 		}
 	}
-	
-	public void movePlayer(){
-		Communicator.sendRequest(ERequestType.MOVE, currentGameRoom, localPid, 0, localPlayer.getPosition());
+
+	public void movePlayer() {
+		Communicator.sendRequest(ERequestType.MOVE, currentGameRoom, Communicator.playerPid, 0, localPlayer.getPosition());
 	}
-	
-	public void setFinished(boolean finished){
+
+	public void setFinished(boolean finished) {
 		isFinished = finished;
 	}
-	
+
 	@Override
 	public void run() {
-		//init();
-		while (!isFinished){
+		while (!isFinished) {
 			try {
 				Thread.sleep(SLEEP_DELTA);
 				update(SLEEP_DELTA_FLOAT);
-			}
-			catch (Exception e){
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}

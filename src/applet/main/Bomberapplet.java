@@ -24,8 +24,7 @@ import dialogs.InitialDialog;
 
 public class Bomberapplet extends Applet {
 	private static final int TARGET_FPS = 60;
-	public static Game gameRef;	// for testing
-	
+
 	private int frameHeight = 480;
 	private int frameWidth = 640;
 	private float deltaTime;
@@ -34,31 +33,30 @@ public class Bomberapplet extends Applet {
 	private Canvas canvas;
 	private Thread gameThread;
 	private boolean running;
-	private CommunicatorHelper communicatorHelper;
 
 	public void destroy() {
 		game.destroy();
 		AudioManager.destroy();
-		communicatorHelper.setFinished(true);
+		CommunicatorHelper.getInstance().setFinished(true);
 
 		remove(canvas);
 		Display.destroy();
 		super.destroy();
 	}
-	
-	public void init() {		
+
+	public void init() {
 		setLayout(new BorderLayout());
 		try {
 			canvas = new Canvas();
 			canvas.setSize(frameWidth, frameHeight);
 			setSize(frameWidth, frameHeight);
-            add(canvas);
-            canvas.setFocusable(true);
-            canvas.requestFocus();
-            canvas.setIgnoreRepaint(true);
-            setVisible(true);
-			
-			gameThread = new Thread(){
+			add(canvas);
+			canvas.setFocusable(true);
+			canvas.requestFocus();
+			canvas.setIgnoreRepaint(true);
+			setVisible(true);
+
+			gameThread = new Thread() {
 				@Override
 				public void run() {
 					running = true;
@@ -66,8 +64,7 @@ public class Bomberapplet extends Applet {
 				}
 			};
 			gameThread.start();
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 			destroy();
 		}
@@ -85,16 +82,14 @@ public class Bomberapplet extends Applet {
 			Display.setParent(canvas);
 			Display.create();
 			Display.setDisplayMode(new DisplayMode(frameWidth, frameHeight));
-		}
-		catch (Exception e){
+		} catch (Exception e) {
 			e.printStackTrace();
 			System.exit(0);
 		}
-	
+
 		// Create and initialize game
 		game = new Game();
 		game.init();
-		gameRef = game;
 
 		GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL11.GL_CLAMP);
 		GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL11.GL_CLAMP);
@@ -103,33 +98,33 @@ public class Bomberapplet extends Applet {
 		GL11.glViewport(0, 0, frameWidth, frameHeight);
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		
+
 		preloadTextures();
-		
-		communicatorHelper = new CommunicatorHelper(game);
+
+		CommunicatorHelper.getInstance().setGame(game);
 		//communicatorHelper.start();
 		InitialDialog initialDialog = new InitialDialog(game);
 		initialDialog.setVisible(true);
 		game.addDialog(initialDialog);
-		
+
 		// Set up the mouse controller
 		LwjglMouseController c = (LwjglMouseController) ControllerManager.getInstance().getController(EController.LWJGLMOUSECONTROLLER);
-		c.addKeybind(0, new ControllerEventListener(){
+		c.addKeybind(0, new ControllerEventListener() {
 
 			@Override
 			public void handleEvent(long eventArg, Vector2 pos, int... params) {
-				if (params[0] == 1){
+				if (params[0] == 1) {
 					game.onClick(pos);
 				}
-			}			
+			}
 		});
-		c.setMouseMoveListener(new ControllerEventListener(){
+		c.setMouseMoveListener(new ControllerEventListener() {
 			@Override
 			public void handleEvent(long eventArg, Vector2 pos, int... params) {
 				game.onHover(pos);
 			}
 		});
-		
+
 		while (running) {
 			t0 = System.currentTimeMillis();
 			deltaTime = (t0 - t1) * 0.001f;
@@ -156,7 +151,7 @@ public class Bomberapplet extends Applet {
 			Display.update();
 			Display.sync(TARGET_FPS);
 		}
-		
+
 		destroy();
 	}
 
@@ -168,24 +163,22 @@ public class Bomberapplet extends Applet {
 		JSONObject animations = json.getJSONObject("animations");
 		String path = null;
 		try {
-			for (int i = 0; i < animations.length(); i++){
+			for (int i = 0; i < animations.length(); i++) {
 				path = animations.getString("" + i);
 				TextureLoader.getInstance().getTexture(Paths.ANIMATIONS + path);
 			}
-		}
-		catch (Exception e){
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
 		JSONObject textures = json.getJSONObject("textures");
 		path = null;
 		try {
-			for (int i = 0; i < textures.length(); i++){
+			for (int i = 0; i < textures.length(); i++) {
 				path = textures.getString("" + i);
 				TextureLoader.getInstance().getTexture(Paths.TEXTURES + path);
 			}
-		}
-		catch (Exception e){
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
