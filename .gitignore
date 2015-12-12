@@ -1,0 +1,4 @@
+hs_err_*
+bin/
+*.classpath
+*.gitconfig
